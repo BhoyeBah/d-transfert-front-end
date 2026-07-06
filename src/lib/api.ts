@@ -1,9 +1,8 @@
 import "server-only";
 
 import { ApiError, UnauthenticatedError, extractErrorMessage } from "@/lib/api-error";
+import { getApiBaseUrl } from "@/lib/api-base-url";
 import { getAccessToken } from "@/lib/session";
-
-const API_BASE_URL = process.env.API_BASE_URL ?? "http://127.0.0.1:8000";
 
 type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
@@ -32,12 +31,23 @@ export async function serverFetch<T = unknown>(
     requestHeaders.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: requestHeaders,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    const apiBaseUrl = getApiBaseUrl();
+    response = await fetch(`${apiBaseUrl}${path}`, {
+      ...init,
+      headers: requestHeaders,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      cache: "no-store",
+    });
+  } catch (error) {
+    throw new ApiError(
+      503,
+      error instanceof Error && error.message
+        ? `Impossible de joindre le backend FastAPI. Vérifie API_BASE_URL dans Coolify. Détail: ${error.message}`
+        : "Impossible de joindre le backend FastAPI. Vérifie API_BASE_URL dans Coolify."
+    );
+  }
 
   if (response.status === 204) {
     return undefined as T;

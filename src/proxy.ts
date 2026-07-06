@@ -1,9 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getApiBaseUrl } from "@/lib/api-base-url";
 import { decodeJwtPayload } from "@/lib/jwt";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/session";
-
-const API_BASE_URL = process.env.API_BASE_URL ?? "http://127.0.0.1:8000";
 
 const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
 
@@ -26,6 +25,12 @@ function isValid(token: string | undefined): boolean {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  let apiBaseUrl: string | undefined;
+  try {
+    apiBaseUrl = getApiBaseUrl();
+  } catch {
+    apiBaseUrl = undefined;
+  }
 
   let accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
@@ -34,21 +39,26 @@ export async function proxy(request: NextRequest) {
   let refreshedRefreshToken: string | undefined;
 
   if (isExpiredOrExpiringSoon(accessToken) && isValid(refreshToken)) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-        cache: "no-store",
-      });
-      if (response.ok) {
-        const data = (await response.json()) as { access_token: string; refresh_token: string };
-        refreshedAccessToken = data.access_token;
-        refreshedRefreshToken = data.refresh_token;
-        accessToken = refreshedAccessToken;
+    if (!apiBaseUrl) {
+      // Sans backend joignable, on laisse la page gérer la session comme absente.
+      // Les appels serveur explicites remonteront ensuite une erreur claire.
+    } else {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/v1/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+          cache: "no-store",
+        });
+        if (response.ok) {
+          const data = (await response.json()) as { access_token: string; refresh_token: string };
+          refreshedAccessToken = data.access_token;
+          refreshedRefreshToken = data.refresh_token;
+          accessToken = refreshedAccessToken;
+        }
+      } catch {
+        // Backend unreachable: fall through, treated the same as "no valid session".
       }
-    } catch {
-      // Backend unreachable: fall through, treated the same as "no valid session".
     }
   }
 
