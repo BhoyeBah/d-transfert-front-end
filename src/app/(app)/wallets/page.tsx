@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-import { ApiError, UnauthenticatedError } from "@/lib/api-error";
 import { getCompanyMe } from "@/lib/data/company";
 import { listWallets } from "@/lib/data/wallets";
 import { formatMoney } from "@/lib/format";
@@ -24,28 +22,7 @@ import { CreateWalletDialog } from "./create-wallet-dialog";
 export const metadata: Metadata = { title: "Wallets — D-Transfert" };
 
 export default async function WalletsPage() {
-  let wallets;
-  let company;
-
-  try {
-    [wallets, company] = await Promise.all([listWallets(), getCompanyMe()]);
-  } catch (error) {
-    if (error instanceof UnauthenticatedError) {
-      redirect("/login");
-    }
-    if (error instanceof ApiError && error.status === 403) {
-      return (
-        <div className="flex flex-col gap-6">
-          <PageHeader
-            title="Wallets"
-            description="Comptes de trésorerie de votre entreprise."
-          />
-          <EmptyState message="Accès refusé: votre compte n'a pas la permission de consulter les wallets." />
-        </div>
-      );
-    }
-    throw error;
-  }
+  const [wallets, company] = await Promise.all([listWallets(), getCompanyMe()]);
 
   return (
     <div className="flex flex-col gap-6">

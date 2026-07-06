@@ -37,7 +37,7 @@ cd .. && poetry run uvicorn app.main:app --port 8000
 
 | Variable | Description |
 |---|---|
-| `API_BASE_URL` | URL du backend FastAPI, joignable uniquement depuis le serveur Next.js (jamais depuis le navigateur). En production, elle doit être définie explicitement dans Coolify. |
+| `API_BASE_URL` | URL du backend FastAPI, joignable uniquement depuis le serveur Next.js (jamais depuis le navigateur). |
 
 ## Composants UI
 

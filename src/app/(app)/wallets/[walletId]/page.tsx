@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
-import { redirect } from "next/navigation";
 
-import { ApiError, UnauthenticatedError } from "@/lib/api-error";
 import { getWallet, listWalletMovements } from "@/lib/data/wallets";
 import { formatDate, formatMoney } from "@/lib/format";
 import { walletTypeLabels } from "@/lib/validation/wallets";
@@ -28,39 +26,10 @@ export default async function WalletDetailPage({
   params: Promise<{ walletId: string }>;
 }) {
   const { walletId } = await params;
-  let wallet;
-  let movements;
-
-  try {
-    [wallet, movements] = await Promise.all([getWallet(walletId), listWalletMovements(walletId)]);
-  } catch (error) {
-    if (error instanceof UnauthenticatedError) {
-      redirect("/login");
-    }
-    if (error instanceof ApiError && error.status === 403) {
-      return (
-        <div className="flex flex-col gap-6">
-          <div>
-            <Link
-              href="/wallets"
-              className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeftIcon className="size-3.5" />
-              Wallets
-            </Link>
-            <div>
-              <h1 className="text-lg font-semibold tracking-tight">Wallet inaccessible</h1>
-              <p className="text-sm text-muted-foreground">
-                Votre compte n&apos;a pas accès à ce wallet.
-              </p>
-            </div>
-          </div>
-          <EmptyState message="Accès refusé." />
-        </div>
-      );
-    }
-    throw error;
-  }
+  const [wallet, movements] = await Promise.all([
+    getWallet(walletId),
+    listWalletMovements(walletId),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">

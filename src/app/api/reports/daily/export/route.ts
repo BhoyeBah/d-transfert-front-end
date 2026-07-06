@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getApiBaseUrl } from "@/lib/api-base-url";
 import { getAccessToken } from "@/lib/session";
+
+const API_BASE_URL = process.env.API_BASE_URL ?? "http://127.0.0.1:8000";
 
 export async function GET(request: NextRequest) {
   const token = await getAccessToken();
@@ -12,24 +13,10 @@ export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get("date");
   const query = date ? `?date=${encodeURIComponent(date)}` : "";
 
-  let response: Response;
-  try {
-    const apiBaseUrl = getApiBaseUrl();
-    response = await fetch(`${apiBaseUrl}/api/v1/reports/daily/export${query}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        detail:
-          error instanceof Error && error.message
-            ? `Impossible de joindre le backend FastAPI. Vérifie API_BASE_URL dans Coolify. Détail: ${error.message}`
-            : "Impossible de joindre le backend FastAPI. Vérifie API_BASE_URL dans Coolify.",
-      },
-      { status: 503 }
-    );
-  }
+  const response = await fetch(`${API_BASE_URL}/api/v1/reports/daily/export${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     return new NextResponse(null, { status: response.status });
