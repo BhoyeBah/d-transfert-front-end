@@ -7,6 +7,12 @@ import { getDashboard } from "@/lib/data/dashboard";
 import { NAV_ITEMS } from "@/lib/nav";
 import { hasPermission } from "@/lib/permissions";
 import { UnauthenticatedError } from "@/lib/api-error";
+import type { NavItem } from "@/lib/nav";
+
+const SUPER_ADMIN_NAV_ITEMS: NavItem[] = [
+  { href: "/dashboard", label: "Tableau de bord", icon: "dashboard", requiredPermission: null },
+  { href: "/admin", label: "Admin plateforme", icon: "shield-check", requiredPermission: null },
+];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   let me: Awaited<ReturnType<typeof getMe>>;
@@ -14,11 +20,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let unreadNotifications = 0;
 
   try {
-    [me, companyName] = await Promise.all([
-      getMe(),
-      getCompanyMe().then((company) => company.name),
-    ]);
-    unreadNotifications = (await getDashboard()).unread_notifications_count;
+    me = await getMe();
+    if (me.is_super_admin) {
+      companyName = "Plateforme";
+    } else {
+      [companyName, unreadNotifications] = await Promise.all([
+        getCompanyMe().then((company) => company.name),
+        getDashboard().then((dashboard) => dashboard.unread_notifications_count),
+      ]);
+    }
   } catch (error) {
     if (error instanceof UnauthenticatedError) {
       redirect("/login");
@@ -26,11 +36,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     throw error;
   }
 
-  const navItems = NAV_ITEMS.filter(
-    (item) =>
-      item.requiredPermission === null ||
-      hasPermission(me.permissions, me.is_owner, me.is_super_admin, item.requiredPermission)
-  );
+  const navItems = me.is_super_admin
+    ? SUPER_ADMIN_NAV_ITEMS
+    : NAV_ITEMS.filter(
+        (item) =>
+          item.requiredPermission === null ||
+          hasPermission(me.permissions, me.is_owner, me.is_super_admin, item.requiredPermission)
+      );
 
   const roleLabel = me.is_super_admin ? "Super Admin" : me.is_owner ? "Owner" : "Employé";
 
@@ -42,6 +54,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       matricule={me.matricule}
       roleLabel={roleLabel}
       unreadNotifications={unreadNotifications}
+      showNotifications={!me.is_super_admin}
     >
       {children}
     </AppShell>

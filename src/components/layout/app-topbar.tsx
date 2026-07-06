@@ -36,6 +36,7 @@ export function AppTopbar({
   roleLabel,
   unreadNotifications,
   navItems,
+  showNotifications = true,
 }: {
   companyName: string;
   fullName: string;
@@ -43,6 +44,7 @@ export function AppTopbar({
   roleLabel: string;
   unreadNotifications: number;
   navItems: NavItem[];
+  showNotifications?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -67,15 +69,19 @@ export function AppTopbar({
         </Badge>
       </div>
 
-      <Button variant="ghost" size="icon" asChild className="relative">
-        <Link href="/notifications">
-          <BellIcon />
-          {unreadNotifications > 0 && (
-            <span className="absolute top-1.5 right-1.5 flex size-2 rounded-full bg-destructive" />
-          )}
-          <span className="sr-only">Notifications</span>
-        </Link>
-      </Button>
+      {showNotifications ? (
+        <Button variant="ghost" size="icon" asChild className="relative">
+          <Link href="/notifications">
+            <BellIcon />
+            {unreadNotifications > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex size-2 rounded-full bg-destructive" />
+            )}
+            <span className="sr-only">Notifications</span>
+          </Link>
+        </Button>
+      ) : (
+        <div className="hidden size-9 sm:block" />
+      )}
 
       <ThemeToggle />
 

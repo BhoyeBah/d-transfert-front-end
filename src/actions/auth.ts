@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { ApiError } from "@/lib/api-error";
+import { decodeJwtPayload } from "@/lib/jwt";
 import { serverFetch } from "@/lib/api";
 import type { ActionState } from "@/lib/action-state";
 import { clearAuthCookies, getRefreshToken, setAuthCookies } from "@/lib/session";
@@ -85,7 +86,8 @@ export async function loginAction(_prevState: ActionState, formData: FormData): 
   }
 
   await setAuthCookies(tokens.access_token, tokens.refresh_token);
-  const next = String(formData.get("next") ?? "/dashboard");
+  const payload = decodeJwtPayload(tokens.access_token);
+  const next = payload?.is_super_admin ? "/admin" : String(formData.get("next") ?? "/dashboard");
   redirect(next.startsWith("/") ? next : "/dashboard");
 }
 

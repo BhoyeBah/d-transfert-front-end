@@ -11,7 +11,9 @@ import {
   XCircle,
 } from "lucide-react";
 
+import { PlatformAdminOverview } from "@/components/platform-admin-overview";
 import { getDashboard } from "@/lib/data/dashboard";
+import { getMe } from "@/lib/data/me";
 import { formatMoney } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -27,6 +29,11 @@ import { StatTile } from "@/components/stat-tile";
 export const metadata: Metadata = { title: "Tableau de bord — D-Transfert" };
 
 export default async function DashboardPage() {
+  const me = await getMe();
+  if (me.is_super_admin) {
+    return <PlatformAdminOverview />;
+  }
+
   const dashboard = await getDashboard();
   const walletCurrencies = Object.entries(dashboard.wallets_balance_by_currency);
 
