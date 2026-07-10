@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 
 import { getWallet, listWalletMovements } from "@/lib/data/wallets";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 import { walletTypeLabels } from "@/lib/validation/wallets";
 import { AmountDisplay } from "@/components/amount-display";
 import { EmptyState } from "@/components/empty-state";

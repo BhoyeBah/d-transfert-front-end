@@ -8,9 +8,11 @@ import { toast } from "sonner";
 
 import { mergeEntriesAction } from "@/actions/entries";
 import { formatDate, formatMoney } from "@/lib/format";
+import type { SortDir } from "@/lib/data-table";
 import type { Entry } from "@/types/api";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SortableHeader } from "@/components/data-table/sortable-header";
 import {
   Table,
   TableBody,
@@ -35,7 +37,17 @@ function availableSummary(entry: Entry) {
   return parts.length > 0 ? parts.join(" · ") : "—";
 }
 
-export function EntriesTable({ entries }: { entries: Entry[] }) {
+export function EntriesTable({
+  entries,
+  sortBy,
+  sortDir,
+  search,
+}: {
+  entries: Entry[];
+  sortBy?: string;
+  sortDir?: SortDir;
+  search?: string;
+}) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -92,11 +104,11 @@ export function EntriesTable({ entries }: { entries: Entry[] }) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-8" />
-            <TableHead>Référence</TableHead>
+            <SortableHeader column="reference" label="Référence" currentSort={sortBy} currentDir={sortDir} search={search} />
             <TableHead>Statut</TableHead>
             <TableHead>Client</TableHead>
             <TableHead className="text-right">Disponible</TableHead>
-            <TableHead>Date</TableHead>
+            <SortableHeader column="created_at" label="Date" currentSort={sortBy} currentDir={sortDir} search={search} />
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>

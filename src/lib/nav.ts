@@ -11,7 +11,8 @@ export type NavIconName =
   | "users"
   | "truck"
   | "file-clock"
-  | "shield-check";
+  | "shield-check"
+  | "bell";
 
 export type NavItem = {
   href: string;
