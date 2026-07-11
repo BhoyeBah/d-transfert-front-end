@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HandCoins, ScrollText, Users } from "lucide-react";
 
 import { listEntries, listEntriesPage } from "@/lib/data/entries";
-import { listWallets } from "@/lib/data/wallets";
+import { listWalletOptions } from "@/lib/data/wallets";
 import { parseDataTableParams, type DataTableSearchParams } from "@/lib/data-table";
 import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
@@ -24,7 +24,7 @@ export default async function EntriesPage({
   const [entriesPage, allEntries, wallets] = await Promise.all([
     listEntriesPage({ page, search, sortBy, sortDir }),
     listEntries(),
-    listWallets(),
+    listWalletOptions(),
   ]);
   const entries = entriesPage.items;
   const mergeableEntriesCount = allEntries.filter(

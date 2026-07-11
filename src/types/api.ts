@@ -87,6 +87,8 @@ export type Wallet = {
   created_at: string;
 };
 
+export type WalletOption = Pick<Wallet, "id" | "name" | "code" | "currency" | "status">;
+
 export type WalletMovement = {
   id: string;
   direction: MovementDirection;
