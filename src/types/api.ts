@@ -87,8 +87,6 @@ export type Wallet = {
   created_at: string;
 };
 
-export type WalletOption = Pick<Wallet, "id" | "name" | "code" | "currency" | "status">;
-
 export type WalletMovement = {
   id: string;
   direction: MovementDirection;
@@ -303,6 +301,7 @@ export type Payment = {
   note: string | null;
   collaborative_rate_used: string;
   converted_amount: string;
+  settles_debt: boolean;
   status: PaymentStatus;
   proof_id: string | null;
   created_by_id: string;
