@@ -87,6 +87,16 @@ export type Wallet = {
   created_at: string;
 };
 
+// Sous-ensemble minimal de Wallet exposé aux rôles opérationnels (entrée/envoi/paiement/
+// validation) sans les permissions wallet.manage complètes — cf. GET /api/v1/wallets/options.
+export type WalletOption = {
+  id: string;
+  name: string;
+  code: string;
+  currency: string;
+  status: WalletStatus;
+};
+
 export type WalletMovement = {
   id: string;
   direction: MovementDirection;
