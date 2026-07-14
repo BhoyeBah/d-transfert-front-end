@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
 import { Clock, HandCoins, Wallet } from "lucide-react";
 
 import { ApiError } from "@/lib/api-error";
@@ -16,6 +17,7 @@ import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatTile } from "@/components/stat-tile";
 import { DataTablePagination } from "@/components/data-table/pagination";
@@ -30,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CreatePaymentDialog } from "./create-payment-dialog";
+import { CancelPaymentButton, PaymentDecisionButtons } from "./[paymentId]/payment-decision-buttons";
 
 export const metadata: Metadata = { title: "Paiements client — D-Transfert" };
 
@@ -146,69 +149,86 @@ export default async function PaymentsPage({
                       currentDir={sortDir}
                       search={search}
                     />
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-mono text-xs">
-                        <Link href={`/payments/${payment.id}`} className="hover:underline">
-                          {payment.reference}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {payment.entry_id ? (
-                          <div className="flex flex-col gap-1">
-                            <Badge variant="outline" className="w-fit">
-                              Via entrée
-                            </Badge>
-                            <Link
-                              href={`/entries/${payment.entry_id}`}
-                              className="font-medium text-foreground hover:underline"
-                            >
-                              {entryReferenceById.get(payment.entry_id) ?? payment.entry_id.slice(0, 8)}
-                            </Link>
-                          </div>
-                        ) : payment.wallet_id ? (
-                          <div className="flex flex-col gap-1">
-                            <Badge variant="secondary" className="w-fit">
-                              Wallet
-                            </Badge>
-                            {canViewWallets ? (
+                  {payments.map((payment) => {
+                    const isCounterparty = payment.company_id !== me.company_id;
+                    const isPending = payment.status === "pending";
+                    return (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-mono text-xs">
+                          <Link href={`/payments/${payment.id}`} className="hover:underline">
+                            {payment.reference}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {payment.entry_id ? (
+                            <div className="flex flex-col gap-1">
+                              <Badge variant="outline" className="w-fit">
+                                Via entrée
+                              </Badge>
                               <Link
-                                href={`/wallets/${payment.wallet_id}`}
+                                href={`/entries/${payment.entry_id}`}
                                 className="font-medium text-foreground hover:underline"
                               >
-                                {walletNameById.get(payment.wallet_id) ?? payment.wallet_id.slice(0, 8)}
+                                {entryReferenceById.get(payment.entry_id) ?? payment.entry_id.slice(0, 8)}
                               </Link>
-                            ) : (
-                              <span className="font-medium text-foreground">
-                                {walletNameById.get(payment.wallet_id) ?? payment.wallet_id.slice(0, 8)}
-                              </span>
-                            )}
+                            </div>
+                          ) : payment.wallet_id ? (
+                            <div className="flex flex-col gap-1">
+                              <Badge variant="secondary" className="w-fit">
+                                Wallet
+                              </Badge>
+                              {canViewWallets ? (
+                                <Link
+                                  href={`/wallets/${payment.wallet_id}`}
+                                  className="font-medium text-foreground hover:underline"
+                                >
+                                  {walletNameById.get(payment.wallet_id) ?? payment.wallet_id.slice(0, 8)}
+                                </Link>
+                              ) : (
+                                <span className="font-medium text-foreground">
+                                  {walletNameById.get(payment.wallet_id) ?? payment.wallet_id.slice(0, 8)}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <Badge variant="secondary" className="w-fit">
+                              Direct
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {payment.client_id
+                            ? clientById.get(payment.client_id)?.name ?? payment.client_name ?? "—"
+                            : payment.client_name ?? "—"}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={payment.status} />
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {formatMoney(payment.amount, payment.currency)}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {formatDate(payment.created_at)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button asChild size="sm" variant="ghost">
+                              <Link href={`/payments/${payment.id}`}>
+                                Voir
+                                <ArrowRightIcon />
+                              </Link>
+                            </Button>
+                            {isPending && isCounterparty && <PaymentDecisionButtons paymentId={payment.id} />}
+                            {isPending && !isCounterparty && <CancelPaymentButton paymentId={payment.id} />}
                           </div>
-                        ) : (
-                          <Badge variant="secondary" className="w-fit">
-                            Direct
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {payment.client_id
-                          ? clientById.get(payment.client_id)?.name ?? payment.client_name ?? "—"
-                          : payment.client_name ?? "—"}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={payment.status} />
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {formatMoney(payment.amount, payment.currency)}
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {formatDate(payment.created_at)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             )}
