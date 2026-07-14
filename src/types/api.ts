@@ -186,7 +186,7 @@ export type Entry = {
 
 // --- Collaborations ---
 
-export type CollaborationStatus = "pending" | "accepted" | "rejected" | "suspended" | "archived";
+export type CollaborationStatus = "pending" | "accepted" | "rejected" | "suspended" | "archived" | "cancelled";
 export type RateProposalStatus = "proposed" | "accepted" | "rejected";
 
 export type Collaboration = {
@@ -226,6 +226,7 @@ export type PrivateRate = {
   country: string | null;
   operation_type: SendMode | null;
   currency: string;
+  target_currency: string | null;
   rate: string;
   is_active: boolean;
   created_at: string;
