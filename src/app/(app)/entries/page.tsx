@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HandCoins, ScrollText, Users } from "lucide-react";
 
 import { listEntries, listEntriesPage } from "@/lib/data/entries";
-import { listWalletOptions } from "@/lib/data/wallets";
+import { listWallets } from "@/lib/data/wallets";
 import { parseDataTableParams, type DataTableSearchParams } from "@/lib/data-table";
 import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
@@ -24,7 +24,7 @@ export default async function EntriesPage({
   const [entriesPage, allEntries, wallets] = await Promise.all([
     listEntriesPage({ page, search, sortBy, sortDir }),
     listEntries(),
-    listWalletOptions(),
+    listWallets(),
   ]);
   const entries = entriesPage.items;
   const mergeableEntriesCount = allEntries.filter(
@@ -72,7 +72,7 @@ export default async function EntriesPage({
             {entries.length === 0 ? (
               <EmptyState message="Aucune entrée ne correspond à cette recherche." />
             ) : (
-              <EntriesTable entries={entries} sortBy={sortBy} sortDir={sortDir} search={search} />
+              <EntriesTable entries={entries} wallets={wallets} sortBy={sortBy} sortDir={sortDir} search={search} />
             )}
             <DataTablePagination
               page={entriesPage.page}
