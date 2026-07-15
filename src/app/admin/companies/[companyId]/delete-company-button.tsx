@@ -51,7 +51,7 @@ export function DeleteCompanyButton({
         <Button
           variant="destructive"
           size={compact ? "icon" : "sm"}
-          className={compact ? "" : "gap-1.5"}
+          className={compact ? "size-8" : "gap-1.5"}
           aria-label={`Supprimer l'entreprise ${companyName}`}
         >
           <Trash2Icon className="size-4" />

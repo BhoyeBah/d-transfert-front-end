@@ -59,8 +59,8 @@ export function CompaniesTable({
               <StatusBadge status={company.status} />
             </TableCell>
             <TableCell>
-              <CompanyStatusActions companyId={company.id} status={company.status} />
-              <div className="mt-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <CompanyStatusActions companyId={company.id} status={company.status} />
                 <DeleteCompanyButton companyId={company.id} companyName={company.name} compact />
               </div>
             </TableCell>

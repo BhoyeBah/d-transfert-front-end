@@ -24,7 +24,7 @@ export function CompanyStatusActions({ companyId, status }: { companyId: string;
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-nowrap gap-2">
       {STATUS_ACTIONS.filter((action) => action.status !== status).map((action) => (
         <Button
           key={action.status}
