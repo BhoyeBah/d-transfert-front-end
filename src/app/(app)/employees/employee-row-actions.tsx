@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { PermissionCheckboxes } from "./permission-checkboxes";
+import { EditEmployeeDialog } from "./edit-employee-dialog";
+import { DeleteEmployeeButton } from "./delete-employee-button";
 
 export function EmployeeRowActions({ employee }: { employee: Employee }) {
   const [open, setOpen] = useState(false);
@@ -50,11 +52,12 @@ export function EmployeeRowActions({ employee }: { employee: Employee }) {
   }
 
   return (
-    <div className="flex items-center justify-end gap-3">
+    <div className="flex flex-wrap items-center justify-end gap-2">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Switch checked={employee.is_active} onCheckedChange={toggleStatus} disabled={isPending} />
         {employee.is_active ? "Actif" : "Désactivé"}
       </div>
+      <EditEmployeeDialog employee={employee} />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
@@ -73,6 +76,7 @@ export function EmployeeRowActions({ employee }: { employee: Employee }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <DeleteEmployeeButton employeeId={employee.id} employeeName={employee.full_name} />
     </div>
   );
 }

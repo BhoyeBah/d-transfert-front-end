@@ -6,7 +6,7 @@ import { serverFetch } from "@/lib/api";
 import { ApiError } from "@/lib/api-error";
 import type { ActionState } from "@/lib/action-state";
 import type { MutationResult } from "@/lib/mutation-result";
-import { createPlatformAdminSchema } from "@/lib/validation/admin";
+import { createPlatformAdminSchema, updatePlatformAdminSchema } from "@/lib/validation/admin";
 import type { CompanyStatus, SubscriptionPlan, SubscriptionStatus } from "@/types/api";
 
 export async function setAdminCompanyStatusAction(
@@ -102,6 +102,39 @@ export async function createPlatformAdminAction(
   return { status: "success" };
 }
 
+export async function updatePlatformAdminAction(
+  adminId: string,
+  payload: { full_name?: string; phone?: string; password?: string }
+): Promise<MutationResult> {
+  const parsed = updatePlatformAdminSchema.safeParse(payload);
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues[0]?.message ?? "Données invalides." };
+  }
+
+  try {
+    await serverFetch(`/api/v1/admin/platform-admins/${adminId}`, {
+      method: "PATCH",
+      body: parsed.data,
+    });
+  } catch (error) {
+    if (error instanceof ApiError) return { ok: false, message: error.message };
+    return { ok: false, message: "Impossible de contacter le serveur." };
+  }
+  revalidatePath("/admin/platform-admins");
+  return { ok: true, data: undefined };
+}
+
+export async function deletePlatformAdminAction(adminId: string): Promise<MutationResult> {
+  try {
+    await serverFetch(`/api/v1/admin/platform-admins/${adminId}`, { method: "DELETE" });
+  } catch (error) {
+    if (error instanceof ApiError) return { ok: false, message: error.message };
+    return { ok: false, message: "Impossible de contacter le serveur." };
+  }
+  revalidatePath("/admin/platform-admins");
+  return { ok: true, data: undefined };
+}
+
 export async function updateAdminSettingsAction(payload: {
   supported_currencies: string[];
   max_transaction_amount: number | null;
@@ -165,4 +198,3 @@ export async function deleteAdminCompanyAction(companyId: string): Promise<Mutat
   revalidatePath("/admin/companies");
   return { ok: true, data: undefined };
 }
-
