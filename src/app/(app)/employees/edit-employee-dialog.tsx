@@ -13,9 +13,9 @@ export function EditEmployeeDialog({ employee }: { employee: Employee }) {
   return (
     <UpdateEntityDialog
       trigger={
-        <Button variant="outline" size="sm" className="gap-1.5">
+        <Button variant="outline" size="icon" className="size-8" title="Modifier" aria-label="Modifier">
           <PencilIcon className="size-4" />
-          Modifier
+          <span className="sr-only">Modifier</span>
         </Button>
       }
       title={`Modifier ${employee.full_name}`}

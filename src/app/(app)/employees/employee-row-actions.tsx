@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { PermissionCheckboxes } from "./permission-checkboxes";
 import { EditEmployeeDialog } from "./edit-employee-dialog";
 import { DeleteEmployeeButton } from "./delete-employee-button";
+import { KeyRoundIcon } from "lucide-react";
 
 export function EmployeeRowActions({ employee }: { employee: Employee }) {
   const [open, setOpen] = useState(false);
@@ -60,8 +61,9 @@ export function EmployeeRowActions({ employee }: { employee: Employee }) {
       <EditEmployeeDialog employee={employee} />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            Permissions
+          <Button variant="outline" size="icon" className="size-8" title="Permissions" aria-label="Permissions">
+            <KeyRoundIcon className="size-4" />
+            <span className="sr-only">Permissions</span>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg">

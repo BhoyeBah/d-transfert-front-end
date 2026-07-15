@@ -40,9 +40,9 @@ export function DeleteEmployeeButton({ employeeId, employeeName }: { employeeId:
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm" className="gap-1.5">
+        <Button variant="destructive" size="icon" className="size-8" title="Supprimer" aria-label="Supprimer">
           <Trash2Icon className="size-4" />
-          Supprimer
+          <span className="sr-only">Supprimer</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

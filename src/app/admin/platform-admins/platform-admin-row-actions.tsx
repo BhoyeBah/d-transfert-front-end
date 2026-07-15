@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { BanIcon, CircleArrowUpIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { setAdminUserStatusAction } from "@/actions/admin";
@@ -17,8 +18,11 @@ export function PlatformAdminRowActions({ admin }: { admin: AdminUser }) {
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        size="icon"
+        className="size-8"
         disabled={isPending}
+        title={admin.is_active ? "Suspendre" : "Réactiver"}
+        aria-label={admin.is_active ? "Suspendre" : "Réactiver"}
         onClick={() =>
           startTransition(async () => {
             const result = await setAdminUserStatusAction(admin.id, null, !admin.is_active);
@@ -30,7 +34,8 @@ export function PlatformAdminRowActions({ admin }: { admin: AdminUser }) {
           })
         }
       >
-        {admin.is_active ? "Suspendre" : "Réactiver"}
+        {admin.is_active ? <BanIcon className="size-4" /> : <CircleArrowUpIcon className="size-4" />}
+        <span className="sr-only">{admin.is_active ? "Suspendre" : "Réactiver"}</span>
       </Button>
       <EditPlatformAdminDialog admin={admin} />
       <DeletePlatformAdminButton adminId={admin.id} adminName={admin.full_name} />
