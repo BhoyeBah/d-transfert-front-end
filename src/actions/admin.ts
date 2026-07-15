@@ -153,3 +153,16 @@ export async function updateAdminSubscriptionAction(
   revalidatePath(`/admin/companies/${companyId}`);
   return { ok: true, data: undefined };
 }
+
+export async function deleteAdminCompanyAction(companyId: string): Promise<MutationResult> {
+  try {
+    await serverFetch(`/api/v1/admin/companies/${companyId}`, { method: "DELETE" });
+  } catch (error) {
+    if (error instanceof ApiError) return { ok: false, message: error.message };
+    return { ok: false, message: "Impossible de contacter le serveur." };
+  }
+  revalidatePath("/admin");
+  revalidatePath("/admin/companies");
+  return { ok: true, data: undefined };
+}
+

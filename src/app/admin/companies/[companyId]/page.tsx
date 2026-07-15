@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { CompanyStatusActions } from "../company-status-actions";
 import { CompanyDetailsForm } from "./company-details-form";
+import { DeleteCompanyButton } from "./delete-company-button";
 import { SubscriptionForm } from "./subscription-form";
 import { UserStatusActions } from "./user-status-actions";
 
@@ -50,9 +51,10 @@ export default async function AdminCompanyDetailPage({
           title={company.name}
           description={`${company.registration_code} · ${company.phone} · ${company.default_currency} · créée le ${formatDate(company.created_at)}`}
           action={
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <StatusBadge status={company.status} />
               <CompanyStatusActions companyId={company.id} status={company.status} />
+              <DeleteCompanyButton companyId={company.id} companyName={company.name} />
             </div>
           }
         />
