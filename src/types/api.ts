@@ -579,6 +579,17 @@ export type PlatformSettings = {
   require_company_approval: boolean;
 };
 
+export type AdminBackup = {
+  filename: string;
+  created_at: string;
+  size_bytes: number;
+};
+
+export type AdminBackupAction = {
+  detail: string;
+  backup: AdminBackup;
+};
+
 export type SubscriptionPlan = "free" | "standard" | "premium";
 export type SubscriptionStatus = "active" | "expired" | "cancelled";
 

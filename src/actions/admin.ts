@@ -8,7 +8,12 @@ import type { ActionState } from "@/lib/action-state";
 import type { MutationResult } from "@/lib/mutation-result";
 import { createPlatformAdminSchema, updatePlatformAdminSchema } from "@/lib/validation/admin";
 import { registerSchema } from "@/lib/validation/auth";
-import type { CompanyStatus, SubscriptionPlan, SubscriptionStatus } from "@/types/api";
+import type {
+  AdminBackupAction,
+  CompanyStatus,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "@/types/api";
 
 type RegisterResponse = {
   company_id: string;
@@ -199,6 +204,35 @@ export async function updateAdminSettingsAction(payload: {
   }
   revalidatePath("/admin/settings");
   return { ok: true, data: undefined };
+}
+
+export async function createAdminBackupAction(): Promise<MutationResult<AdminBackupAction>> {
+  try {
+    const result = await serverFetch<AdminBackupAction>("/api/v1/admin/backups", {
+      method: "POST",
+    });
+    revalidatePath("/admin/settings");
+    return { ok: true, data: result };
+  } catch (error) {
+    if (error instanceof ApiError) return { ok: false, message: error.message };
+    return { ok: false, message: "Impossible de contacter le serveur." };
+  }
+}
+
+export async function restoreAdminBackupAction(
+  filename: string
+): Promise<MutationResult<AdminBackupAction>> {
+  try {
+    const result = await serverFetch<AdminBackupAction>("/api/v1/admin/backups/restore", {
+      method: "POST",
+      body: { filename },
+    });
+    revalidatePath("/admin/settings");
+    return { ok: true, data: result };
+  } catch (error) {
+    if (error instanceof ApiError) return { ok: false, message: error.message };
+    return { ok: false, message: "Impossible de contacter le serveur." };
+  }
 }
 
 export async function updateAdminSubscriptionAction(
