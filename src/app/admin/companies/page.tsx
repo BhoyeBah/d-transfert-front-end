@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { DataTableSearchForm } from "@/components/data-table/search-form";
+import { CreateCompanyDialog } from "./create-company-dialog";
 import { CompaniesTable } from "./companies-table";
 
 export const metadata: Metadata = { title: "Entreprises — Administration D-Transfert" };
@@ -25,6 +26,7 @@ export default async function AdminCompaniesPage({
       <PageHeader
         title="Entreprises"
         description={`${companiesPage.total} entreprise${companiesPage.total > 1 ? "s" : ""} inscrite${companiesPage.total > 1 ? "s" : ""} sur la plateforme.`}
+        action={<CreateCompanyDialog />}
       />
 
       <DataTableSearchForm
