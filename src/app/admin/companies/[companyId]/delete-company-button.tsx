@@ -22,9 +22,11 @@ import {
 export function DeleteCompanyButton({
   companyId,
   companyName,
+  compact = false,
 }: {
   companyId: string;
   companyName: string;
+  compact?: boolean;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -46,9 +48,14 @@ export function DeleteCompanyButton({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm" className="gap-1.5">
+        <Button
+          variant="destructive"
+          size={compact ? "icon" : "sm"}
+          className={compact ? "" : "gap-1.5"}
+          aria-label={`Supprimer l'entreprise ${companyName}`}
+        >
           <Trash2Icon className="size-4" />
-          Supprimer l&apos;entreprise
+          {!compact && "Supprimer l'entreprise"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
