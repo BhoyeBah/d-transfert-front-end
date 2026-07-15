@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 
 import { serverFetch } from "@/lib/api";
 import { ApiError } from "@/lib/api-error";
+import { getPublicPlatformSettings } from "@/lib/data/platform-settings";
 import type { ActionState } from "@/lib/action-state";
 import type { MutationResult } from "@/lib/mutation-result";
 import { createPlatformAdminSchema, updatePlatformAdminSchema } from "@/lib/validation/admin";
-import { registerSchema } from "@/lib/validation/auth";
+import { createRegisterSchema } from "@/lib/validation/auth";
 import type {
   AdminBackupAction,
   CompanyStatus,
@@ -67,7 +68,8 @@ export async function createAdminCompanyAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const parsed = registerSchema.safeParse({
+  const { supported_currencies } = await getPublicPlatformSettings();
+  const parsed = createRegisterSchema(supported_currencies).safeParse({
     company_name: formData.get("company_name"),
     company_phone: formData.get("company_phone"),
     address: formData.get("address"),

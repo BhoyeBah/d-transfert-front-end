@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 
 import { getAdminCompanyDetail, getAdminSubscription, listAdminCompanyUsers } from "@/lib/data/admin";
+import { getPublicPlatformSettings } from "@/lib/data/platform-settings";
 import { formatDate, formatMoney } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
 import { StatTile } from "@/components/stat-tile";
@@ -36,6 +37,7 @@ export default async function AdminCompanyDetailPage({
     listAdminCompanyUsers(companyId),
     getAdminSubscription(companyId),
   ]);
+  const { supported_currencies } = await getPublicPlatformSettings();
   const balanceEntries = Object.entries(company.wallets_balance_by_currency);
 
   return (
@@ -75,7 +77,7 @@ export default async function AdminCompanyDetailPage({
           <CardTitle>Informations de l&apos;entreprise</CardTitle>
         </CardHeader>
         <CardContent>
-          <CompanyDetailsForm company={company} />
+          <CompanyDetailsForm company={company} supportedCurrencies={supported_currencies} />
         </CardContent>
       </Card>
 

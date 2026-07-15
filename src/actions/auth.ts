@@ -4,13 +4,14 @@ import { redirect } from "next/navigation";
 
 import { ApiError } from "@/lib/api-error";
 import { serverFetch } from "@/lib/api";
+import { getPublicPlatformSettings } from "@/lib/data/platform-settings";
 import { decodeJwtPayload } from "@/lib/jwt";
 import type { ActionState } from "@/lib/action-state";
 import { clearAuthCookies, getRefreshToken, setAuthCookies } from "@/lib/session";
 import {
   forgotPasswordSchema,
   loginSchema,
-  registerSchema,
+  createRegisterSchema,
   resetPasswordSchema,
 } from "@/lib/validation/auth";
 
@@ -18,7 +19,8 @@ type TokenResponse = { access_token: string; refresh_token: string };
 type RegisterResponse = { company_id: string; registration_code: string; owner_user_id: string };
 
 export async function registerAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
-  const parsed = registerSchema.safeParse({
+  const { supported_currencies } = await getPublicPlatformSettings();
+  const parsed = createRegisterSchema(supported_currencies).safeParse({
     company_name: formData.get("company_name"),
     company_phone: formData.get("company_phone"),
     address: formData.get("address"),

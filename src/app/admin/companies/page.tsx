@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { listAdminCompaniesPage } from "@/lib/data/admin";
+import { getPublicPlatformSettings } from "@/lib/data/platform-settings";
 import { parseDataTableParams, type DataTableSearchParams } from "@/lib/data-table";
 import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
@@ -18,7 +19,10 @@ export default async function AdminCompaniesPage({
   searchParams: Promise<DataTableSearchParams>;
 }) {
   const { page, search, sortBy, sortDir } = parseDataTableParams(await searchParams);
-  const companiesPage = await listAdminCompaniesPage({ page, search, sortBy, sortDir });
+  const [companiesPage, settings] = await Promise.all([
+    listAdminCompaniesPage({ page, search, sortBy, sortDir }),
+    getPublicPlatformSettings(),
+  ]);
   const companies = companiesPage.items;
 
   return (
@@ -26,7 +30,7 @@ export default async function AdminCompaniesPage({
       <PageHeader
         title="Entreprises"
         description={`${companiesPage.total} entreprise${companiesPage.total > 1 ? "s" : ""} inscrite${companiesPage.total > 1 ? "s" : ""} sur la plateforme.`}
-        action={<CreateCompanyDialog />}
+        action={<CreateCompanyDialog supportedCurrencies={settings.supported_currencies} />}
       />
 
       <DataTableSearchForm

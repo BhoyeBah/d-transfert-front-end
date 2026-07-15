@@ -6,18 +6,11 @@ import { toast } from "sonner";
 
 import { createAdminCompanyAction } from "@/actions/admin";
 import type { ActionState } from "@/lib/action-state";
-import { SUPPORTED_CURRENCIES } from "@/lib/validation/auth";
+import { CurrencySelect } from "@/components/currency-select";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type CreateCompanyData = {
   company_id: string;
@@ -39,16 +32,16 @@ function SubmitButton({ isPending }: { isPending: boolean }) {
   );
 }
 
-export function CreateCompanyDialog() {
+export function CreateCompanyDialog({ supportedCurrencies }: { supportedCurrencies: string[] }) {
   const [open, setOpen] = useState(false);
-  const [currency, setCurrency] = useState<string>(SUPPORTED_CURRENCIES[0]);
+  const [currency, setCurrency] = useState<string>(supportedCurrencies[0] ?? "XOF");
   const [state, setState] = useState<CreateCompanyState>(INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   function resetForm() {
     setState(INITIAL_STATE);
-    setCurrency(SUPPORTED_CURRENCIES[0]);
+    setCurrency(supportedCurrencies[0] ?? "XOF");
     formRef.current?.reset();
   }
 
@@ -135,19 +128,13 @@ export function CreateCompanyDialog() {
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="default_currency">Devise par défaut</Label>
-                <Select value={currency} onValueChange={setCurrency}>
-                  <SelectTrigger id="default_currency" className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SUPPORTED_CURRENCIES.map((code) => (
-                      <SelectItem key={code} value={code}>
-                        {code}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <input type="hidden" name="default_currency" value={currency} />
+                <CurrencySelect
+                  id="default_currency"
+                  name="default_currency"
+                  value={currency}
+                  onValueChange={setCurrency}
+                  currencies={supportedCurrencies}
+                />
               </div>
             </div>
 
