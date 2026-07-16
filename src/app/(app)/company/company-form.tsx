@@ -38,6 +38,9 @@ export function CompanyForm({
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
+      {state.status === "error" && state.message && (
+        <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{state.message}</p>
+      )}
       <div className="grid gap-1.5">
         <Label htmlFor="name">Nom de l&apos;entreprise</Label>
         <Input id="name" name="name" defaultValue={company.name} required />
@@ -70,9 +73,6 @@ export function CompanyForm({
           )}
         </div>
       </div>
-      {state.status === "error" && state.message && (
-        <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{state.message}</p>
-      )}
       <div className="flex justify-end">
         <Button type="submit" disabled={isPending}>
           {isPending ? "Enregistrement..." : "Enregistrer"}
