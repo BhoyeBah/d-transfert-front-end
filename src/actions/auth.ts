@@ -134,7 +134,7 @@ export async function forgotPasswordAction(
     return { status: "error", message: "Impossible de contacter le serveur." };
   }
 
-  redirect(`/reset-password?matricule=${encodeURIComponent(parsed.data.matricule)}`);
+  redirect(`/reset-password?matricule=${encodeURIComponent(parsed.data.matricule)}&sent=success`);
 }
 
 export async function resetPasswordAction(
