@@ -37,7 +37,7 @@ export function CompanyForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4">
+    <form onSubmit={onSubmit} method="post" className="grid gap-4">
       {state.status === "error" && state.message && (
         <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{state.message}</p>
       )}
