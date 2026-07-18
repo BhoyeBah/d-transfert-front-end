@@ -19,6 +19,7 @@ import {
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { QuickSearch } from "@/components/layout/quick-search";
+import { useNotifications } from "@/components/layout/notifications-provider";
 import type { NavItem } from "@/lib/nav";
 
 function initials(name: string) {
@@ -35,7 +36,6 @@ export function AppTopbar({
   fullName,
   matricule,
   roleLabel,
-  unreadNotifications,
   navItems,
   showNotifications = true,
 }: {
@@ -43,10 +43,11 @@ export function AppTopbar({
   fullName: string;
   matricule: string;
   roleLabel: string;
-  unreadNotifications: number;
   navItems: NavItem[];
   showNotifications?: boolean;
 }) {
+  const { unreadCount } = useNotifications();
+
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
       <div className="mx-auto flex h-16 w-full max-w-[1400px] items-center gap-3">
@@ -88,7 +89,7 @@ export function AppTopbar({
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href="/notifications">
                 <BellIcon />
-                {unreadNotifications > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute top-2 right-2 flex size-2 rounded-full bg-destructive" />
                 )}
                 <span className="sr-only">Notifications</span>

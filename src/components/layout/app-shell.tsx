@@ -34,7 +34,6 @@ export function AppShell({
   fullName,
   matricule,
   roleLabel,
-  unreadNotifications,
   showNotifications = true,
   children,
 }: {
@@ -43,7 +42,6 @@ export function AppShell({
   fullName: string;
   matricule: string;
   roleLabel: string;
-  unreadNotifications: number;
   showNotifications?: boolean;
   children: React.ReactNode;
 }) {
@@ -103,7 +101,6 @@ export function AppShell({
           fullName={fullName}
           matricule={matricule}
           roleLabel={roleLabel}
-          unreadNotifications={unreadNotifications}
           navItems={navItems}
           showNotifications={showNotifications}
         />
