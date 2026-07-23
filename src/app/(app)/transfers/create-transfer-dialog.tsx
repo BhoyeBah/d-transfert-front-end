@@ -18,7 +18,6 @@ import { formatMoney } from "@/lib/format";
 import { mergeCurrencies } from "@/lib/currencies";
 import type { Collaboration, Entry, PrivateRate } from "@/types/api";
 import { Button } from "@/components/ui/button";
-import { CurrencySelect } from "@/components/currency-select";
 import {
   Dialog,
   DialogContent,
@@ -283,13 +282,21 @@ export function CreateTransferDialog({
 
           <div className="grid gap-1.5">
             <Label htmlFor="target_currency">Devise de destination (bénéficiaire)</Label>
-            <CurrencySelect
-              id="target_currency"
-              name="target_currency"
+            <Select
               value={targetCurrency ?? ""}
               onValueChange={(value) => setValue("target_currency", value)}
-              currencies={mergeCurrencies(supportedCurrencies, targetCurrency || undefined)}
-            />
+            >
+              <SelectTrigger id="target_currency" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {mergeCurrencies(supportedCurrencies, targetCurrency || undefined).map((code) => (
+                  <SelectItem key={code} value={code}>
+                    {currency || "?"} → {code}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.target_currency && (
               <p className="text-sm text-destructive">{errors.target_currency.message}</p>
             )}
