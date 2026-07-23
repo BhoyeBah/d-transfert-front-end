@@ -9,7 +9,6 @@ import { getMe } from "@/lib/data/me";
 import { listPrivateRates } from "@/lib/data/private-rates";
 import { listTransfers, listTransfersPage } from "@/lib/data/transfers";
 import { listWallets } from "@/lib/data/wallets";
-import { getPublicPlatformSettings } from "@/lib/data/platform-settings";
 import { parseDataTableParams, type DataTableSearchParams } from "@/lib/data-table";
 import { formatDate, formatMoney } from "@/lib/format";
 import { hasPermission, PermissionCode } from "@/lib/permissions";
@@ -58,7 +57,7 @@ export default async function TransfersPage({
 }) {
   const rawParams = await searchParams;
   const { page, search, sortBy, sortDir } = parseDataTableParams(rawParams);
-  const [transfersPage, allTransfers, collaborations, entries, privateRates, wallets, me, settings] =
+  const [transfersPage, allTransfers, collaborations, entries, privateRates, wallets, me] =
     await Promise.all([
       listTransfersPage({ page, search, sortBy, sortDir }),
       listTransfers(),
@@ -67,7 +66,6 @@ export default async function TransfersPage({
       orEmptyOn403(listPrivateRates()),
       orEmptyOn403(listWallets()),
       getMe(),
-      getPublicPlatformSettings(),
     ]);
   const transfers = transfersPage.items;
   const entryReferenceById = new Map(entries.map((entry) => [entry.id, entry.reference]));
@@ -94,7 +92,6 @@ export default async function TransfersPage({
             entries={entries}
             privateRates={privateRates}
             canViewPrivateRates={canViewPrivateRates}
-            supportedCurrencies={settings.supported_currencies}
             initialEntryId={initialEntryId}
             initialOpen={Boolean(initialEntryId)}
           />
