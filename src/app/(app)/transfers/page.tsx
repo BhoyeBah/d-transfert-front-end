@@ -9,6 +9,7 @@ import { getMe } from "@/lib/data/me";
 import { listPrivateRates } from "@/lib/data/private-rates";
 import { listTransfers, listTransfersPage } from "@/lib/data/transfers";
 import { listWallets } from "@/lib/data/wallets";
+import { getPublicPlatformSettings } from "@/lib/data/platform-settings";
 import { parseDataTableParams, type DataTableSearchParams } from "@/lib/data-table";
 import { formatDate, formatMoney } from "@/lib/format";
 import { hasPermission, PermissionCode } from "@/lib/permissions";
@@ -57,18 +58,19 @@ export default async function TransfersPage({
 }) {
   const rawParams = await searchParams;
   const { page, search, sortBy, sortDir } = parseDataTableParams(rawParams);
-  const [transfersPage, allTransfers, collaborations, entries, privateRates, wallets, me] = await Promise.all([
-    listTransfersPage({ page, search, sortBy, sortDir }),
-    listTransfers(),
-    orEmptyOn403(listCollaborations()),
-    orEmptyOn403(listEntries()),
-    orEmptyOn403(listPrivateRates()),
-    orEmptyOn403(listWallets()),
-    getMe(),
-  ]);
+  const [transfersPage, allTransfers, collaborations, entries, privateRates, wallets, me, settings] =
+    await Promise.all([
+      listTransfersPage({ page, search, sortBy, sortDir }),
+      listTransfers(),
+      orEmptyOn403(listCollaborations()),
+      orEmptyOn403(listEntries()),
+      orEmptyOn403(listPrivateRates()),
+      orEmptyOn403(listWallets()),
+      getMe(),
+      getPublicPlatformSettings(),
+    ]);
   const transfers = transfersPage.items;
   const entryReferenceById = new Map(entries.map((entry) => [entry.id, entry.reference]));
-  const collaborationById = new Map(collaborations.map((collaboration) => [collaboration.id, collaboration]));
   const acceptedCollaborations = collaborations.filter((c) => c.status === "accepted");
   const initialEntryId = rawParams.entry ?? null;
   const pendingCount = allTransfers.filter((transfer) => transfer.status === "pending").length;
@@ -92,6 +94,7 @@ export default async function TransfersPage({
             entries={entries}
             privateRates={privateRates}
             canViewPrivateRates={canViewPrivateRates}
+            supportedCurrencies={settings.supported_currencies}
             initialEntryId={initialEntryId}
             initialOpen={Boolean(initialEntryId)}
           />
@@ -168,11 +171,10 @@ export default async function TransfersPage({
                 </TableHeader>
                 <TableBody>
                   {transfers.map((transfer) => {
-                    const collaboration = collaborationById.get(transfer.collaboration_id);
                     const isCounterparty = transfer.company_id !== me.company_id;
                     const isPending = transfer.status === "pending";
                     const walletsForApproval = wallets.filter(
-                      (wallet) => wallet.currency === collaboration?.currency && wallet.status === "active"
+                      (wallet) => wallet.currency === transfer.target_currency && wallet.status === "active"
                     );
                     return (
                       <TableRow key={transfer.id}>
@@ -212,9 +214,9 @@ export default async function TransfersPage({
                         <TableCell className="text-right tabular-nums">
                           <div className="flex flex-col items-end">
                             <span className="font-medium">
-                              {formatMoney(transfer.converted_amount, collaboration?.currency ?? transfer.currency)}
+                              {formatMoney(transfer.converted_amount, transfer.target_currency)}
                             </span>
-                            {collaboration && collaboration.currency !== transfer.currency && (
+                            {transfer.target_currency !== transfer.currency && (
                               <span className="text-xs text-muted-foreground">
                                 {formatMoney(transfer.amount, transfer.currency)}
                               </span>

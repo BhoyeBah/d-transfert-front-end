@@ -248,6 +248,7 @@ export type Transfer = {
   client_debt_amount: string | null;
   amount: string;
   currency: string;
+  target_currency: string;
   beneficiary_name: string | null;
   beneficiary_phone: string;
   send_mode: SendMode;
