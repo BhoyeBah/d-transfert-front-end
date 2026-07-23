@@ -285,14 +285,15 @@ export function CreateTransferDialog({
             <Select
               value={targetCurrency ?? ""}
               onValueChange={(value) => setValue("target_currency", value)}
+              disabled={!currency}
             >
               <SelectTrigger id="target_currency" className="w-full">
-                <SelectValue />
+                <SelectValue placeholder="Choisissez d'abord une collaboration" />
               </SelectTrigger>
               <SelectContent>
                 {mergeCurrencies(supportedCurrencies, targetCurrency || undefined).map((code) => (
                   <SelectItem key={code} value={code}>
-                    {currency || "?"} → {code}
+                    {currency} → {code}
                   </SelectItem>
                 ))}
               </SelectContent>
